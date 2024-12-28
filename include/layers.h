@@ -5,16 +5,15 @@
 #include <stdlib.h>
 
 typedef struct {
-  size_t input_size;
-  size_t output_size;
-  size_t batch_size;
+  int input_size;
+  int output_size;
+  int batch_size;
   float *weights;
   float *biases;
   float *output;
 } DenseLayer;
 
-DenseLayer *create_dense_layer(size_t input_size, size_t output_size,
-                               size_t batch_size);
+DenseLayer *create_dense_layer(int input_size, int output_size, int batch_size);
 void free_dense_layer(DenseLayer *layer);
 
 #endif  // LAYERS_H

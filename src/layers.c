@@ -1,7 +1,7 @@
 #include "layers.h"
 
-DenseLayer *create_dense_layer(size_t input_size, size_t output_size,
-                               size_t batch_size) {
+DenseLayer *create_dense_layer(int input_size, int output_size,
+                               int batch_size) {
   // Allocate memory for the DenseLayer structure
   DenseLayer *layer = (DenseLayer *)malloc(sizeof(DenseLayer));
 
@@ -16,7 +16,8 @@ DenseLayer *create_dense_layer(size_t input_size, size_t output_size,
   layer->batch_size = batch_size;
 
   // Allocate memory for weights (input_size x output_size)
-  layer->weights = (float *)malloc(input_size * output_size * sizeof(float));
+  layer->weights =
+      (float *)malloc((size_t)input_size * (size_t)output_size * sizeof(float));
 
   if (layer->weights == NULL) {
     perror("Failed to allocate memory for weights");
@@ -25,7 +26,7 @@ DenseLayer *create_dense_layer(size_t input_size, size_t output_size,
   }
 
   // // Allocate memory for biases (output_size)
-  layer->biases = (float *)malloc(output_size * sizeof(float));
+  layer->biases = (float *)malloc((size_t)output_size * sizeof(float));
 
   if (layer->biases == NULL) {
     perror("Failed to allocate memory for biases");
@@ -35,7 +36,8 @@ DenseLayer *create_dense_layer(size_t input_size, size_t output_size,
   }
 
   // Allocate memory for the output (batch_size x output_size)
-  layer->output = (float *)malloc(batch_size * output_size * sizeof(float));
+  layer->output =
+      (float *)malloc((size_t)batch_size * (size_t)output_size * sizeof(float));
 
   if (layer->output == NULL) {
     perror("Failed to allocate memory for output");
@@ -46,12 +48,12 @@ DenseLayer *create_dense_layer(size_t input_size, size_t output_size,
   }
 
   // Initialize weights
-  for (size_t i = 0; i < input_size * output_size; i++) {
+  for (int i = 0; i < input_size * output_size; i++) {
     layer->weights[i] = 0.0f;
   }
 
   // Initialize biases
-  for (size_t i = 0; i < output_size; i++) {
+  for (int i = 0; i < output_size; i++) {
     layer->biases[i] = 0.0f;
   }
 

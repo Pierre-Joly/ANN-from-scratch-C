@@ -4,17 +4,22 @@
 #include "layers.h"
 
 typedef struct {
-  size_t num_layers;
-  size_t batch_size;
+  int num_layers;
+  int batch_size;
   DenseLayer **layers;
-  float (*activation)(float);
-  float (*output_activation)(float);
+  void (*activation)(const float *restrict, float *restrict, const int,
+                     const int);
+  void (*output_activation)(const float *restrict, float *restrict, const int,
+                            const int);
 } DenseNetwork;
 
-DenseNetwork *create_dense_network(size_t num_layers, size_t batch_size,
-                                   float (*activation)(float),
-                                   float (*output_activation)(float));
-int add_layer(DenseNetwork *network, size_t index, DenseLayer *layer);
+DenseNetwork *create_dense_network(
+    int num_layers, int batch_size,
+    void (*activation)(const float *restrict, float *restrict, const int,
+                       const int),
+    void (*output_activation)(const float *restrict, float *restrict, const int,
+                              const int));
+int add_layer(DenseNetwork *network, int index, DenseLayer *layer);
 void free_dense_network(DenseNetwork *network);
 
 #endif  // NETWORKS_H
