@@ -5,53 +5,65 @@
 #include <stdio.h>
 
 static void test_sigmoid_batch(void) {
-  float input[] = {0, 10, -10, 1, -1, 5};  // Column-major order
+  // Input in column-major order: batch_size = 3, input_size = 2
+  float input[] = {0.0f, 10.0f, -10.0f, 1.0f, -1.0f, 5.0f};
   float output[6] = {0};
-  sigmoid_batch(input, output, 3, 2);  // batch_size = 3, num_batches = 2
 
-  assert(fabsf(output[0] - 0.5f) < 1e-6f);
-  assert(fabsf(output[1] - 0.9999546f) < 1e-6f);
-  assert(fabsf(output[2] - 0.0000454f) < 1e-6f);
-  assert(fabsf(output[3] - 0.7310586f) < 1e-6f);
-  assert(fabsf(output[4] - 0.2689414f) < 1e-6f);
-  assert(fabsf(output[5] - 0.9933071f) < 1e-6f);
+  sigmoid_batch(input, output, 3, 2);
+
+  // Compare results with expected sigmoid values
+  // Index mapping: output[idx] = output[feature * batch_size + sample]
+  // (feature = 0..1, sample = 0..2)
+  assert(fabsf(output[0] - 0.5f) < 1e-6f);        // sigmoid(0)
+  assert(fabsf(output[1] - 0.9999546f) < 1e-6f);  // sigmoid(10)
+  assert(fabsf(output[2] - 0.0000454f) < 1e-6f);  // sigmoid(-10)
+  assert(fabsf(output[3] - 0.7310586f) < 1e-6f);  // sigmoid(1)
+  assert(fabsf(output[4] - 0.2689414f) < 1e-6f);  // sigmoid(-1)
+  assert(fabsf(output[5] - 0.9933071f) < 1e-6f);  // sigmoid(5)
 }
 
 static void test_relu_batch(void) {
-  float input[] = {-5.0f, 0.0f, 5.0f,
-                   -1.0f, 2.0f, -3.0f};  // Column-major order
+  // Input in column-major order: batch_size = 3, input_size = 2
+  float input[] = {-5.0f, 0.0f, 5.0f, -1.0f, 2.0f, -3.0f};
   float output[6] = {0};
-  relu_batch(input, output, 3, 2);  // batch_size = 3, num_batches = 2
 
-  assert(output[0] == 0.0f);
-  assert(output[1] == 0.0f);
-  assert(output[2] == 5.0f);
-  assert(output[3] == 0.0f);
-  assert(output[4] == 2.0f);
-  assert(output[5] == 0.0f);
+  relu_batch(input, output, 3, 2);
+
+  // Compare ReLU outputs
+  // For ReLU, negative values become 0
+  assert(output[0] == 0.0f);  // relu(-5)
+  assert(output[1] == 0.0f);  // relu(0)
+  assert(output[2] == 5.0f);  // relu(5)
+  assert(output[3] == 0.0f);  // relu(-1)
+  assert(output[4] == 2.0f);  // relu(2)
+  assert(output[5] == 0.0f);  // relu(-3)
 }
 
 static void test_tanh_batch(void) {
-  float input[] = {0, 1, -1, 5, -5, 10};  // Column-major order
+  // Input in column-major order: batch_size = 3, input_size = 2
+  float input[] = {0.0f, 1.0f, -1.0f, 5.0f, -5.0f, 10.0f};
   float output[6] = {0};
-  tanh_batch(input, output, 3, 2);  // batch_size = 3, num_batches = 2
 
-  assert(fabsf(output[0] - 0.0f) < 1e-6f);
-  assert(fabsf(output[1] - 0.7615942f) < 1e-6f);
-  assert(fabsf(output[2] + 0.7615942f) < 1e-6f);
-  assert(fabsf(output[3] - 0.9999092f) < 1e-6f);
-  assert(fabsf(output[4] + 0.9999092f) < 1e-6f);
-  assert(fabsf(output[5] - 1.0f) < 1e-6f);
+  tanh_batch(input, output, 3, 2);
+
+  // Compare with expected tanh values
+  assert(fabsf(output[0] - 0.0f) < 1e-6f);        // tanh(0)
+  assert(fabsf(output[1] - 0.7615942f) < 1e-6f);  // tanh(1)
+  assert(fabsf(output[2] + 0.7615942f) < 1e-6f);  // tanh(-1)
+  assert(fabsf(output[3] - 0.9999092f) < 1e-6f);  // tanh(5) ~ 0.9999092
+  assert(fabsf(output[4] + 0.9999092f) < 1e-6f);  // tanh(-5) ~ -0.9999092
+  assert(fabsf(output[5] - 1.0f) < 1e-6f);  // tanh(10) ~ 0.9999999 (approx 1.0)
 }
 
 static void test_leaky_relu_batch(void) {
-  float input[] = {-5.0f, 0.0f, 5.0f,
-                   -1.0f, 2.0f, -3.0f};  // Column-major order
+  // Input in column-major order: batch_size = 3, input_size = 2
+  float input[] = {-5.0f, 0.0f, 5.0f, -1.0f, 2.0f, -3.0f};
   float output[6] = {0};
   float alpha = 0.1f;
-  leaky_relu_batch(input, output, 3, 2,
-                   alpha);  // batch_size = 3, num_batches = 2
 
+  leaky_relu_batch(input, output, 3, 2, alpha);
+
+  // Compare with expected Leaky ReLU outputs
   assert(fabsf(output[0] - (-5.0f * alpha)) < 1e-6f);
   assert(output[1] == 0.0f);
   assert(output[2] == 5.0f);
@@ -61,20 +73,21 @@ static void test_leaky_relu_batch(void) {
 }
 
 static void test_softmax_batch(void) {
-  float input[] = {1, 2, 3, 1, 2, 3};  // Column-major order
+  // Input in column-major order: batch_size = 3, input_size = 2
+  float input[] = {1.0f, 2.0f, 3.0f, 1.0f, 2.0f, 3.0f};
   float output[6] = {0};
-  softmax_batch(input, output, 3, 2);  // batch_size = 3, num_batches = 2
 
-  // Check normalization for each batch (column-major indexing)
-  for (int i = 0; i < 3; i++) {
+  softmax_batch(input, output, 3, 2);
+
+  // Verify that each column sums to 1
+  // Column-major indexing: output[feature * batch_size + sample]
+  for (int row = 0; row < 3; row++) {
     float sum = 0.0f;
-    for (int b = 0; b < 2; b++) {
-      sum += output[i * 2 + b];  // Adjust index to column-major
+    for (int col = 0; col < 2; col++) {
+      sum += output[row * 2 + col];
     }
     assert(fabsf(sum - 1.0f) < 1e-6f);
   }
-
-  // Validate individual softmax values (column-major indexing)
 }
 
 void test_activations(void) {

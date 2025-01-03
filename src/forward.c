@@ -2,11 +2,9 @@
 
 #include "operations.h"
 
-static inline void process_layer(const DenseLayer *layer, const float *input,
-                                 float *output, int batch_size,
-                                 void (*activation)(const float *restrict,
-                                                    float *restrict, const int,
-                                                    const int)) {
+static inline void process_dense_layer(
+    const DenseLayer *layer, const float *input, float *output, int batch_size,
+    void (*activation)(const float *, float *, const int, const int)) {
   int input_size = layer->input_size;
   int output_size = layer->output_size;
 
@@ -23,7 +21,7 @@ static inline void process_layer(const DenseLayer *layer, const float *input,
   }
 
   // Apply activation function batch-wise
-  activation(output, output, (int)batch_size, (int)output_size);
+  activation(output, output, output_size, batch_size);
 }
 
 float *dense_forward(DenseNetwork *network, const float *input) {
@@ -47,8 +45,8 @@ float *dense_forward(DenseNetwork *network, const float *input) {
     }
 
     // Process the layer with internal activation
-    process_layer(layer, current_input, layer->output, batch_size,
-                  network->activation);
+    process_dense_layer(layer, current_input, layer->output, batch_size,
+                        network->activation);
 
     // Update the current input to the output of this layer
     current_input = layer->output;
@@ -62,8 +60,8 @@ float *dense_forward(DenseNetwork *network, const float *input) {
     return NULL;
   }
 
-  process_layer(last_layer, current_input, last_layer->output, batch_size,
-                network->output_activation);
+  process_dense_layer(last_layer, current_input, last_layer->output, batch_size,
+                      network->output_activation);
 
   // Return the output of the last layer
   return last_layer->output;
