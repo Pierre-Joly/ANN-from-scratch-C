@@ -76,21 +76,7 @@ By default, the network will read the dataset from `data/dataset.txt`, train for
 
 ## Project Structure
 
-```
-ANN-from-scratch-C/
-├── data/
-│   └── dataset.txt         # Default dataset used for training
-├── doc/
-│   ├── ANN-from-scratch.pdf # PDF doc with more details
-│   └── Doxyfile            # Doxygen config for generating HTML doc
-├── dataset.c
-├── dataset.h
-├── main.c
-├── net.c
-├── net.h
-├── Makefile
-└── README.md
-```
+
 
 ## Contributing
 
